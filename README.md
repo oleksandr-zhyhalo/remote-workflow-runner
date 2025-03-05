@@ -1,4 +1,4 @@
-# Cross-Repo Workflow Trigger Action
+# Remote  Workflow Trigger Action
 
 This GitHub Action triggers a workflow in another repository, waits for it to complete, and reports back the status. It's useful for creating CI/CD pipelines that span multiple repositories.
 

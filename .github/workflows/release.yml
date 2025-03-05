@@ -34,18 +34,6 @@ jobs:
         with:
           tag_name: ${{ steps.get_version.outputs.version }}
           release_name: Release ${{ steps.get_version.outputs.version }}
-          body: |
-            ## Changes in this release
-            ${{ steps.get_changelog.outputs.changelog }}
-            
-            ## How to use this version
-            ```yaml
-            - uses: oleksandr-zhyhalo/remote-workflow-trigger@${{ steps.get_version.outputs.version }}
-              with:
-                target_repo: 'org/repo'
-                workflow_id: 'build.yml'
-                github_token: ${{ secrets.CROSS_REPO_PAT }}
-            ```
           draft: false
           prerelease: false
       

@@ -1,0 +1,32 @@
+name: Trigger Remote Workflow Example
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  trigger-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Trigger workflow in another repository
+        uses: ./  # Assuming this action is in the current repository
+        id: trigger
+        with:
+          target_repo: 'other-org/target-repo'
+          workflow_id: 'build.yml'  # Can be filename or workflow ID
+          github_token: ${{ secrets.CROSS_REPO_PAT }}  # PAT with workflow permissions
+          ref: 'main'
+          inputs: '{"param1": "value1", "param2": "value2"}'
+          wait_interval: '15'  # Check status every 15 seconds
+          timeout: '1800'  # Wait up to 30 minutes
+      
+      - name: Check result
+        run: |
+          echo "Workflow URL: ${{ steps.trigger.outputs.workflow_url }}"
+          echo "Status: ${{ steps.trigger.outputs.status }}"
+          echo "Conclusion: ${{ steps.trigger.outputs.conclusion }}"
+          echo "Run ID: ${{ steps.trigger.outputs.run_id }}"

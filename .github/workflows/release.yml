@@ -1,0 +1,56 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: Get changelog
+        id: get_changelog
+        run: |
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD | grep -v "Merge" || echo "- First release")
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          body: |
+            ## Changes in this release
+            ${{ steps.get_changelog.outputs.changelog }}
+            
+            ## How to use this version
+            ```yaml
+            - uses: oleksandr-zhyhalo/remote-workflow-trigger@${{ steps.get_version.outputs.version }}
+              with:
+                target_repo: 'org/repo'
+                workflow_id: 'build.yml'
+                github_token: ${{ secrets.CROSS_REPO_PAT }}
+            ```
+          draft: false
+          prerelease: false
+      
+      - name: Update major version tag
+        run: |
+          MAJOR_VERSION=$(echo "${{ steps.get_version.outputs.version }}" | cut -d. -f1)
+          git tag -fa $MAJOR_VERSION -m "Update $MAJOR_VERSION tag"
+          git push origin $MAJOR_VERSION --force

@@ -1,0 +1,48 @@
+name: 'Cross-Repo Workflow Trigger'
+description: 'Triggers a workflow in another repository, waits for it to finish, and reports back the status'
+author: 'Your Name'
+
+inputs:
+  target_repo:
+    description: 'The repository to trigger the workflow in (format: owner/repo)'
+    required: true
+  workflow_id:
+    description: 'The ID or filename of the workflow to trigger'
+    required: true
+  github_token:
+    description: 'GitHub Personal Access Token (PAT) with workflow permissions on the target repository'
+    required: true
+  ref:
+    description: 'The git reference to run the workflow against (branch, tag, or SHA)'
+    required: false
+    default: 'main'
+  inputs:
+    description: 'JSON string containing workflow inputs'
+    required: false
+    default: '{}'
+  wait_interval:
+    description: 'Seconds to wait between status checks'
+    required: false
+    default: '10'
+  timeout:
+    description: 'Maximum seconds to wait for workflow completion'
+    required: false
+    default: '3600'
+
+outputs:
+  workflow_url:
+    description: 'URL of the triggered workflow run'
+  status:
+    description: 'Final status of the workflow run (success, failure, cancelled, etc.)'
+  conclusion:
+    description: 'Conclusion of the workflow run'
+  run_id:
+    description: 'ID of the triggered workflow run'
+
+runs:
+  using: 'node22'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'git-branch'
+  color: 'blue'

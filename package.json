@@ -4,7 +4,7 @@
   "description": "GitHub Action to trigger a workflow in another repository and wait for completion",
   "main": "src/index.js",
   "scripts": {
-    "build": "ncc build src/index.js -o dist --source-map",
+	"build": "npx @vercel/ncc build src/index.js -o dist --source-map",
     "test": "jest",
     "lint": "eslint ."
   },

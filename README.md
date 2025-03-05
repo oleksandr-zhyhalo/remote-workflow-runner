@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger workflow in another repository
-        uses: your-username/cross-repo-workflow-trigger@v1
+        uses: oleksandr-zhyhalo/remote-workflow-trigger@v1
         id: trigger
         with:
           target_repo: 'org/repo'

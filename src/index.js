@@ -13,7 +13,6 @@ async function run() {
     const waitInterval = parseInt(core.getInput('wait_interval'), 10);
     const timeout = parseInt(core.getInput('timeout'), 10);
     
-    // Parse inputs JSON if provided
     let workflowInputs = {};
     if (inputsJson) {
       try {

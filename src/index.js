@@ -28,6 +28,14 @@ async function run() {
     
     // Trigger the workflow
     core.info(`Triggering workflow "${workflowId}" in repository "${targetRepo}" on ref "${ref}"`);
+
+    core.info(`API call parameters: 
+      owner: ${owner}
+      repo: ${repo}
+      workflow_id: ${workflowId}
+      ref: ${ref}
+      inputs: ${JSON.stringify(workflowInputs)}
+    `);
     
     const dispatchResponse = await octokit.rest.actions.createWorkflowDispatch({
       owner,

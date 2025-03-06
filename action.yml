@@ -1,6 +1,6 @@
-name: 'Cross-Repo Workflow Trigger'
+name: 'Remote Workflow Trigger'
 description: 'Triggers a workflow in another repository, waits for it to finish, and reports back the status'
-author: 'Your Name'
+author: 'Oleksandr Zhyhalo'
 
 inputs:
   target_repo:

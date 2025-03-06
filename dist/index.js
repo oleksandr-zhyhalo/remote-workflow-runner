@@ -92,8 +92,11 @@ async function run() {
     const octokit = github.getOctokit(token);
     const [owner, repo] = targetRepo.split('/');
     
+    // Record timestamp before triggering the workflow
+    const triggerTime = new Date();
+    
     // Trigger the workflow
-    core.info(`Triggering workflow "${workflowId}" in repository "${targetRepo}" on ref "${ref}"`);
+    core.info(`Triggering workflow "${workflowId}" in repository "${targetRepo}" on ref "${ref}" at ${triggerTime.toISOString()}`);
 
     core.info(`API call parameters: 
       owner: ${owner}
@@ -131,17 +134,26 @@ async function run() {
         owner,
         repo,
         workflow_id: workflowId,
-        branch: ref
+        branch: ref,
+        // Add event type if you know it (e.g., 'workflow_dispatch')
+        // event: 'workflow_dispatch'
       });
       
       // Find the most recent run that was created after we dispatched
-      const run = runsResponse.data.workflow_runs[0];
+      const recentRuns = runsResponse.data.workflow_runs;
       
-      if (run) {
-        runId = run.id;
+      // Look for runs created after our trigger time
+      const newRun = recentRuns.find(run => {
+        const runCreatedAt = new Date(run.created_at);
+        return runCreatedAt > triggerTime;
+      });
+      
+      if (newRun) {
+        runId = newRun.id;
         core.info(`Workflow started with run ID: ${runId}`);
+        core.info(`Run created at: ${newRun.created_at}, which is after our trigger time: ${triggerTime.toISOString()}`);
         core.setOutput('run_id', `${runId}`);
-        core.setOutput('workflow_url', run.html_url);
+        core.setOutput('workflow_url', newRun.html_url);
       } else {
         core.info('Workflow not yet started. Waiting...');
         await setTimeout(waitInterval * 1000);
@@ -189,7 +201,6 @@ async function run() {
 }
 
 run();
-
 module.exports = __webpack_exports__;
 /******/ })()
 ;
